@@ -41,7 +41,7 @@
         },
         "tags": {
           "title": "NFC tags",
-          "description": "Tapping any of these tags on a reader completes the reminder. Tags are optional: the Done button and the notification buttons always work. Tick Scan a new tag to add one by touching it to a reader next.",
+          "description": "Tapping any of these tags on a reader completes the reminder. One physical tag can have two IDs: the phone reads the ID written on it, while readers such as a HearthPanel read its hardware ID. Add both: tick Scan a new tag now and tap it on the phone, then do it again on the other reader. Tags are optional: the Done button and the notification buttons always work. Tick Scan a new tag to add one by touching it to a reader next.",
           "data": {
             "tags": "Tags",
             "learn": "Scan a new tag now"

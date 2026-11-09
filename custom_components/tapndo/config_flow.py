@@ -244,7 +244,7 @@ class ReminderSubentryFlow(ConfigSubentryFlow):
         tag = task.result()
         if tag:
             self._data[CONF_TAGS] = list(dict.fromkeys([*self._data.get(CONF_TAGS, []), tag]))
-        return self.async_show_progress_done(next_step_id="notify")
+        return self.async_show_progress_done(next_step_id="tags")  # scan again with another reader if you like
 
     async def async_step_notify(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
         errors: dict[str, str] = {}

@@ -144,7 +144,9 @@ async def test_learn_tag_step(hass: HomeAssistant) -> None:
     hass.bus.async_fire("tag_scanned", {"tag_id": "04-AA-BB"})
     await hass.async_block_till_done()
     flow = await hass.config_entries.subentries.async_configure(flow["flow_id"])
-    assert flow["step_id"] == "notify"  # the finished scan moved the flow on by itself
+    assert flow["step_id"] == "tags"  # back on the tags step, so a second reader can scan the same tag
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], {"tags": ["04-AA-BB"], "learn": False})
+    assert flow["step_id"] == "notify"
     flow = await hass.config_entries.subentries.async_configure(
         flow["flow_id"], {"snooze_minutes": 60, "nag_interval": 0, "nag_max": 0, "escalate_after": 0}
     )
