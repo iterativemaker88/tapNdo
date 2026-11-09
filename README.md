@@ -47,7 +47,7 @@ tapNdo raises a repair notice when a reminder's tag is no longer in Home Assista
 
 ## Limitations
 
-* Action buttons work only for companion app services whose name starts with `mobile_app_`. `notify.send_message` entities carry no buttons.
+* Action buttons work for companion app services (`mobile_app_...`). If you choose a phone's notify entity instead, tapNdo uses that phone's companion app service automatically, so it gets the buttons too. Other notify entities (for example a panel) get plain text.
 * Notification texts are English.
 * One tapNdo instance per Home Assistant.
 

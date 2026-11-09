@@ -4,8 +4,15 @@ from __future__ import annotations
 
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
-from pytest_homeassistant_custom_component.common import async_capture_events, async_fire_time_changed, async_mock_service
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    async_capture_events,
+    async_fire_time_changed,
+    async_mock_service,
+)
 
 from custom_components.tapndo.const import DOMAIN
 
@@ -217,6 +224,40 @@ async def test_require_home_holds_notifications_back(hass: HomeAssistant, freeze
     await advance(hass, freezer, local(9, 11, 0, 30))
     assert hass.states.get("sensor.vitamin_d").state == "due"
     assert calls == []
+
+
+async def test_phone_chosen_as_notify_entity_still_gets_buttons(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """notify.<phone> entities only send text; the phone's mobile_app service is used instead so Done/Snooze appear."""
+    freezer.move_to(local(9, 8))
+    service_calls = async_mock_service(hass, "notify", "mobile_app_sm_s938b")
+    entity_calls = async_mock_service(hass, "notify", "send_message")
+    app = MockConfigEntry(domain="mobile_app", title="SM-S938B")
+    app.add_to_hass(hass)
+    device = dr.async_get(hass).async_get_or_create(
+        config_entry_id=app.entry_id, identifiers={("mobile_app", "dev1")}, name="SM-S938B"
+    )
+    er.async_get(hass).async_get_or_create(
+        "notify", "mobile_app", "dev1", suggested_object_id="galaxy_s25", config_entry=app, device_id=device.id
+    )
+    hass.states.async_set("notify.galaxy_s25", "unknown")
+    cfg = dict(VITAMIN, notify_services=[], notify_entities=["notify.galaxy_s25"])
+    await setup_entry(hass, cfg)
+
+    await advance(hass, freezer, local(9, 11, 0, 30))
+    assert entity_calls == []
+    assert len(service_calls) == 1
+    assert [a["title"] for a in service_calls[0].data["data"]["actions"]] == ["Done", "Snooze"]
+
+
+async def test_plain_notify_entity_gets_text_only(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    freezer.move_to(local(9, 8))
+    entity_calls = async_mock_service(hass, "notify", "send_message")
+    hass.states.async_set("notify.panel", "unknown")
+    await setup_entry(hass, dict(VITAMIN, notify_services=[], notify_entities=["notify.panel"]))
+    await advance(hass, freezer, local(9, 11, 0, 30))
+    assert len(entity_calls) == 1
+    assert entity_calls[0].data["entity_id"] == "notify.panel"
+    assert "data" not in entity_calls[0].data
 
 
 async def test_escalation_adds_second_target(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:

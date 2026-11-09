@@ -8,8 +8,11 @@ from datetime import datetime
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
+from homeassistant.util import slugify
 
 from .const import ACTION_DONE_PREFIX, ACTION_SNOOZE_PREFIX, DOMAIN
 
@@ -34,6 +37,38 @@ def normalise_service(name: str) -> str:
     """Accept 'notify.mobile_app_pixel' as well as 'mobile_app_pixel'."""
     name = name.strip()
     return name.split(".", 1)[1] if name.startswith("notify.") else name
+
+
+def phone_service_for_entity(hass: HomeAssistant, entity_id: str) -> str | None:
+    """The companion app's notify service for a phone's notify entity, if there is one.
+
+    A notify entity can only send text. The service of the same phone (notify.mobile_app_<device name>) also
+    takes action buttons, so a phone chosen as an entity still gets Done and Snooze."""
+    entry = er.async_get(hass).async_get(entity_id)
+    if entry is None or entry.platform != "mobile_app" or entry.device_id is None:
+        return None
+    device = dr.async_get(hass).async_get(entry.device_id)
+    if device is None or not (device.name_by_user or device.name):
+        return None
+    for name in (device.name, device.name_by_user):
+        if name:
+            service = f"mobile_app_{slugify(name)}"
+            if hass.services.has_service("notify", service):
+                return service
+    return None
+
+
+def resolve_targets(hass: HomeAssistant, targets: Targets) -> Targets:
+    """Swap phone entities for their companion app service, so they get buttons and clearing."""
+    services = list(targets.services)
+    entities: list[str] = []
+    for entity in targets.entities:
+        service = phone_service_for_entity(hass, entity)
+        if service is None:
+            entities.append(entity)
+        elif service not in services:
+            services.append(service)
+    return Targets(services=services, entities=entities)
 
 
 def available_services(hass: HomeAssistant) -> list[str]:
@@ -64,6 +99,7 @@ async def async_send(
 ) -> None:
     """Send one reminder to every target. A broken target never stops the others."""
     tag = f"tapndo-{reminder_id}"
+    targets = resolve_targets(hass, targets)
     for entity in targets.entities:
         issue = f"missing_target_{reminder_id}_{entity}"
         if hass.states.get(entity) is None:
@@ -92,6 +128,7 @@ async def async_send(
 
 async def async_clear(hass: HomeAssistant, reminder_id: str, targets: Targets) -> None:
     """Remove the notification from phones once the reminder is done or missed."""
+    targets = resolve_targets(hass, targets)
     for service in targets.services:
         if is_phone(service) and hass.services.has_service("notify", service):
             await _call(
