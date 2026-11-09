@@ -87,6 +87,30 @@ async def test_add_fixed_reminder(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.stretch") is not None  # the entry reloaded and the entity exists
 
 
+async def test_escalation_targets_alone_are_rejected(hass: HomeAssistant) -> None:
+    """Putting the phone only in the escalation fields once meant nothing was ever sent."""
+    async_mock_service(hass, "notify", "mobile_app_pixel")
+    entry = await setup_entry(hass)
+    flow = await hass.config_entries.subentries.async_init((entry.entry_id, SUBENTRY_REMINDER), context={"source": SOURCE_USER})
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], {"name": "Test", "kind": "fixed"})
+    flow = await hass.config_entries.subentries.async_configure(
+        flow["flow_id"], {"freq": "daily", "time": "09:00:00", "window_hours": 0, "interval": 2, "month_day": 1}
+    )
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], {"tags": [], "learn": False})
+    base = {"snooze_minutes": 60, "nag_interval": 0, "nag_max": 0}
+
+    flow = await hass.config_entries.subentries.async_configure(
+        flow["flow_id"], {**base, "escalate_after": 0, "escalate_services": ["mobile_app_pixel"]}
+    )
+    assert flow["errors"] == {"notify_services": "targets_missing", "escalate_after": "escalate_needs_number"}
+
+    flow = await hass.config_entries.subentries.async_configure(
+        flow["flow_id"],
+        {**base, "escalate_after": 2, "notify_services": ["mobile_app_pixel"], "escalate_services": ["mobile_app_pixel"]},
+    )
+    assert flow["step_id"] == "extras"
+
+
 async def test_add_after_done_reminder_every_n_days_gets_anchor(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass)
     flow = await hass.config_entries.subentries.async_init((entry.entry_id, SUBENTRY_REMINDER), context={"source": SOURCE_USER})

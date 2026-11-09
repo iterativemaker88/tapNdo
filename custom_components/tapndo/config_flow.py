@@ -258,6 +258,13 @@ class ReminderSubentryFlow(ConfigSubentryFlow):
             for key in (CONF_SNOOZE_MINUTES, CONF_NAG_INTERVAL, CONF_NAG_MAX, CONF_ESCALATE_AFTER):
                 if key in user_input:
                     user_input[key] = int(user_input[key])
+            has_main = bool(user_input.get(CONF_NOTIFY_SERVICES) or user_input.get(CONF_NOTIFY_ENTITIES))
+            has_escalation = bool(user_input.get(CONF_ESCALATE_SERVICES) or user_input.get(CONF_ESCALATE_ENTITIES))
+            if has_escalation and not has_main:
+                # Escalation targets only join the normal ones, so on their own nothing would ever be sent
+                errors[CONF_NOTIFY_SERVICES] = "targets_missing"
+            if has_escalation and user_input.get(CONF_ESCALATE_AFTER, 0) < 1:
+                errors[CONF_ESCALATE_AFTER] = "escalate_needs_number"
             if not errors:
                 self._data.update(user_input)
                 return await self.async_step_extras()

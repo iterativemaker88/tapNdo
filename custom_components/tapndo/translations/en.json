@@ -52,7 +52,7 @@
         },
         "notify": {
           "title": "Notifications",
-          "description": "Choose where reminders go. Companion app services (mobile_app_...) also get Done and Snooze buttons. Nagging repeats every N minutes, up to the maximum. Escalation targets are added from the chosen reminder number on.",
+          "description": "Choose where reminders go: at least one service or entity in the first two fields. Companion app services (mobile_app_...) also get Done and Snooze buttons. Nagging repeats every N minutes, up to the maximum. Escalation is optional: it adds more targets from the chosen reminder number on (the number must be 1 or more).",
           "data": {
             "notify_services": "Notify services",
             "notify_entities": "Notify entities",
@@ -85,7 +85,9 @@
         "name_required": "Enter a name.",
         "weekdays_required": "Choose at least one day.",
         "unknown_service": "This notify service does not exist.",
-        "quiet_both": "Set both the start and the end, or neither."
+        "quiet_both": "Set both the start and the end, or neither.",
+        "targets_missing": "Choose at least one notify target here. Escalation targets are only added to these, they are not used on their own.",
+        "escalate_needs_number": "Escalation targets need a reminder number of 1 or more, otherwise they are never used."
       },
       "abort": {
         "reconfigure_successful": "Reminder updated."
