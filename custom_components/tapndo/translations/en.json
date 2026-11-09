@@ -1,0 +1,206 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "tapNdo",
+        "description": "tapNdo has nothing to set up here. After this, add your reminders from the tapNdo integration page with Add reminder."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "tapNdo is already set up."
+    }
+  },
+  "config_subentries": {
+    "reminder": {
+      "initiate_flow": {
+        "user": "Add reminder",
+        "reconfigure": "Change reminder"
+      },
+      "entry_type": "Reminder",
+      "step": {
+        "user": {
+          "title": "New reminder",
+          "description": "Fixed reminders follow the calendar (every day at 11:00). After-last-done reminders follow you: they come due a set time after you last did it.",
+          "data": {
+            "name": "Name",
+            "kind": "Schedule type"
+          }
+        },
+        "schedule": {
+          "title": "Schedule",
+          "description": "Window: how many hours it stays due before it counts as missed. 0 means until the end of the day. Every N days counts from the day you create the reminder.",
+          "data": {
+            "freq": "Repeat",
+            "time": "Time",
+            "weekdays": "Days of the week",
+            "interval": "Every N days, or how long after last done",
+            "unit": "Unit",
+            "month_day": "Day of the month",
+            "window_hours": "Window (hours)"
+          }
+        },
+        "tags": {
+          "title": "NFC tags",
+          "description": "Tapping any of these tags on a reader completes the reminder. Tags are optional: the Done button and the notification buttons always work. Tick Scan a new tag to add one by touching it to a reader next.",
+          "data": {
+            "tags": "Tags",
+            "learn": "Scan a new tag now"
+          }
+        },
+        "learn": {
+          "title": "Scan a tag"
+        },
+        "notify": {
+          "title": "Notifications",
+          "description": "Choose where reminders go. Companion app services (mobile_app_...) also get Done and Snooze buttons. Nagging repeats every N minutes, up to the maximum. Escalation targets are added from the chosen reminder number on.",
+          "data": {
+            "notify_services": "Notify services",
+            "notify_entities": "Notify entities",
+            "snooze_minutes": "Snooze (minutes)",
+            "nag_interval": "Repeat every (minutes, 0 = once)",
+            "nag_max": "Maximum repeats",
+            "escalate_after": "Escalate from reminder number (0 = never)",
+            "escalate_services": "Escalation notify services",
+            "escalate_entities": "Escalation notify entities",
+            "require_home": "Only notify while one of these people is home"
+          }
+        },
+        "extras": {
+          "title": "More options",
+          "description": "Quiet hours hold notifications back. The reminder itself still changes state. Scripts run when the reminder becomes due, is done or is missed.",
+          "data": {
+            "early_completion": "A tap before the due time counts as done",
+            "quiet_start": "Quiet hours start",
+            "quiet_end": "Quiet hours end",
+            "on_due": "Script when due",
+            "on_done": "Script when done",
+            "on_missed": "Script when missed"
+          }
+        }
+      },
+      "progress": {
+        "scan": "Hold the tag against a reader now. This step waits for 60 seconds."
+      },
+      "error": {
+        "name_required": "Enter a name.",
+        "weekdays_required": "Choose at least one day.",
+        "unknown_service": "This notify service does not exist.",
+        "quiet_both": "Set both the start and the end, or neither."
+      },
+      "abort": {
+        "reconfigure_successful": "Reminder updated."
+      }
+    }
+  },
+  "selector": {
+    "kind": {
+      "options": {
+        "fixed": "Fixed time (follows the calendar)",
+        "after_done": "After last done (follows you)"
+      }
+    },
+    "freq": {
+      "options": {
+        "daily": "Every day",
+        "weekly": "On chosen weekdays",
+        "every_n_days": "Every N days",
+        "monthly": "Every month"
+      }
+    },
+    "unit": {
+      "options": {
+        "days": "Days",
+        "weeks": "Weeks"
+      }
+    },
+    "weekday": {
+      "options": {
+        "0": "Monday",
+        "1": "Tuesday",
+        "2": "Wednesday",
+        "3": "Thursday",
+        "4": "Friday",
+        "5": "Saturday",
+        "6": "Sunday"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "reminder": {
+        "state": {
+          "upcoming": "Upcoming",
+          "due": "Due",
+          "snoozed": "Snoozed",
+          "done": "Done",
+          "missed": "Missed"
+        }
+      },
+      "due": {
+        "name": "Due"
+      }
+    },
+    "button": {
+      "done": {
+        "name": "Done"
+      },
+      "snooze": {
+        "name": "Snooze"
+      }
+    },
+    "switch": {
+      "vacation": {
+        "name": "Vacation mode"
+      }
+    },
+    "calendar": {
+      "schedule": {
+        "name": "Schedule"
+      }
+    },
+    "todo": {
+      "due_list": {
+        "name": "Due now"
+      }
+    }
+  },
+  "services": {
+    "complete": {
+      "name": "Complete",
+      "description": "Marks the reminder done, as if its tag had been tapped."
+    },
+    "snooze": {
+      "name": "Snooze",
+      "description": "Hides a due reminder for a while.",
+      "fields": {
+        "minutes": {
+          "name": "Minutes",
+          "description": "How long to snooze. Defaults to the reminder's own snooze time."
+        }
+      }
+    },
+    "skip": {
+      "name": "Skip",
+      "description": "Skips the current occurrence without changing the streak."
+    },
+    "reset": {
+      "name": "Reset",
+      "description": "Clears the history and streak and starts the schedule again from now."
+    }
+  },
+  "issues": {
+    "missing_target": {
+      "title": "A notify target no longer exists",
+      "description": "A tapNdo reminder tries to notify {target}, but Home Assistant does not have it. Change the reminder or restore the integration that provides it."
+    },
+    "missing_tag": {
+      "title": "A tag is no longer registered",
+      "description": "The reminder {reminder} listens for the tag {tag}, which is not in Home Assistant's tag list. Re-add the tag or change the reminder. The Done button still works."
+    }
+  },
+  "exceptions": {
+    "unknown_reminder": {
+      "message": "This reminder no longer exists."
+    }
+  }
+}

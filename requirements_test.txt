@@ -1,0 +1,2 @@
+# The plugin release tracks Home Assistant one to one: 0.13.372 pins homeassistant==2026.10.1.
+pytest-homeassistant-custom-component==0.13.372

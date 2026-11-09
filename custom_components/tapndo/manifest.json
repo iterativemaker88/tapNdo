@@ -1,0 +1,14 @@
+{
+  "domain": "tapndo",
+  "name": "tapNdo",
+  "codeowners": ["@REPLACE-ME"],
+  "config_flow": true,
+  "dependencies": ["tag", "todo", "calendar"],
+  "documentation": "https://github.com/REPLACE-ME/tapndo",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/REPLACE-ME/tapndo/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
