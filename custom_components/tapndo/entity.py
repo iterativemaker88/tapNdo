@@ -52,7 +52,9 @@ class ReminderEntity(TapndoEntity):
             name=reminder.name,
             manufacturer="tapNdo",
         )
-        hub = dr.async_get(manager.hass).async_get_device(identifiers={(DOMAIN, manager.entry.entry_id)})
+        hub = dr.async_get(manager.hass).async_get_device_by_identifier(
+            (DOMAIN, manager.entry.entry_id), manager.entry.entry_id
+        )
         if hub is not None:
             info["via_device_id"] = hub.id
         self._attr_device_info = info
