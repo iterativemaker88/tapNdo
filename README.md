@@ -10,7 +10,7 @@ tapNdo contains no reader code. It listens to Home Assistant's own `tag_scanned`
 
 ## Install
 
-1. Add this repository to HACS as a custom repository (category: Integration), install **tapNdo**, restart Home Assistant.
+1. In HACS add `https://github.com/iterativemaker88/tapNdo` as a custom repository (category: Integration), install **tapNdo**, restart Home Assistant.
 2. Settings, Devices & services, Add integration, **tapNdo**.
 3. On the tapNdo page choose **Add reminder**.
 

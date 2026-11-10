@@ -1,13 +1,13 @@
 {
   "domain": "tapndo",
   "name": "tapNdo",
-  "codeowners": ["@REPLACE-ME"],
+  "codeowners": ["@iterativemaker88"],
   "config_flow": true,
   "dependencies": ["tag", "todo", "calendar"],
-  "documentation": "https://github.com/REPLACE-ME/tapndo",
+  "documentation": "https://github.com/iterativemaker88/tapNdo",
   "integration_type": "service",
   "iot_class": "calculated",
-  "issue_tracker": "https://github.com/REPLACE-ME/tapndo/issues",
+  "issue_tracker": "https://github.com/iterativemaker88/tapNdo/issues",
   "requirements": [],
   "single_config_entry": true,
   "version": "0.1.0"
